@@ -12,7 +12,7 @@ label variable RSTATEID "State Names"
 label define RSTATEID 	///
 	1 "Andhra Pradesh" 	///
 	2 "Tamil Nadu" 		///
-	3 "Kerala" 			///
+	3 "Kerala"			///
 	4 "Karnataka" 		///
 	5 "Lakshawadeep" 	///
 	6 "A&N Islands" 	///
@@ -58,7 +58,7 @@ graph pie if POOR2 == 0 & RSTATEID != ., over(SOCREL) plabel(_all percent) title
 graph pie if POOR2 == 1 & RSTATEID != ., over(SOCREL) plabel(_all percent) title("POOR SOCREL")
 
 bysort URBAN: tab SOCREL if POOR2 == 1 			// Doubt
-graph pie if POOR2==1, over(socrel) by(URBAN)	// Doubt
+graph pie if POOR2 == 1, over(socrel) by(URBAN)	// Doubt
 
 ** --- 5 ---
 ** Generate a `TRANS` to represent poverty transitions
@@ -123,6 +123,7 @@ graph pie if TRANS == 4 & RSTATEID != ., over(socrel) plabel(_all percent) pie(_
 generate SOL_DIR = 0 if XASSETS5 > ASSETS5
 replace SOL_DIR = 1 if XASSETS5 == ASSETS5
 replace SOL_DIR = 2 if XASSETS5 < ASSETS5 & ASSETS != .
+order ASSETS5 SOL_DIR, after(XASSETS5)
 
 label variable SOL_DIR "Direction of Change of Standard of Living"
 label define SOL_DIR 0 "Negative" 1 "Unchanged" 2 "Positive"
@@ -132,18 +133,19 @@ label value SOL_DIR SOL_DIR
 generate ASSETS_DIR = 0 if XASSETS2005 > ASSETS2005
 replace ASSETS_DIR = 1 if XASSETS2005 == ASSETS2005
 replace ASSETS_DIR = 2 if XASSETS2005 < ASSETS2005 & ASSETS != .
+order ASSETS2005 ASSETS_DIR, after(XASSETS2005)
 
 label variable ASSETS_DIR "Direction of Change in Asset Holdings"
 label define ASSETS_DIR 0 "Negative" 1 "Unchanged" 2 "Positive"
 label value ASSETS_DIR ASSETS_DIR
 
 ** --- 2 ---
-tab SOCREL SOL_DIR
-tab SOCREL ASSETS_DIR
+tab SOCREL SOL_DIR if RSTATEID != .
+tab SOCREL ASSETS_DIR if RSTATEID != .
 
 ** --- 3 ---
 // WARNING: correlation amongst categorical variables?
-corr TRANS_DIR SOL_DIR ASSETS_DIR
+corr TRANS_DIR SOL_DIR ASSETS_DIR  if RSTATEID != .
 ** Somewhat strong positive correlation b/w the transition variables
 
 
