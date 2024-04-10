@@ -28,7 +28,7 @@ label define socrel 2 "HFC" 3 "HOBC" 4 "HSC" 5 "HST" 6 "Muslims" 7 "Others"
 label value socrel socrel
 label variable socrel "Socio-Religious Identity"
 
-****A
+** ---SECTION A---
 ****1****
 tab socrel if RSTATEID != .
 graph bar (count), over(socrel)
@@ -105,7 +105,6 @@ graph pie if trans==4 & RSTATEID != ., over(socrel) plabel(_all percent) plabel(
  * 2 = Positive
  * . = . [Inconclusive] */
 
-// WARNING: "necessarily not poor," how to proceed?
 generate SOL_DIR = 0 if XASSETS5 > ASSETS5
 replace SOL_DIR = 1 if XASSETS5 == ASSETS5
 replace SOL_DIR = 2 if XASSETS5 < ASSETS5 & ASSETS != .
@@ -126,13 +125,51 @@ label define ASSETS_DIR 0 "Negative" 1 "Unchanged" 2 "Positive"
 label value ASSETS_DIR ASSETS_DIR
 
 ** --- 2 ---
-tab SOCREL SOL_DIR 
-tab SOCREL ASSETS_DIR
+tab socrel SOL_DIR 
+tab socrel ASSETS_DIR
 
-** --- 3 ---
+**-- 3 --
 order trans_cond, before(XASSETS5)
 bysort trans_cond:tab ASSETS_DIR
 graph pie,over(ASSETS_DIR) by(trans_cond) plabel(_all percent) plabel(1 percent)
 bysort trans_cond:tab SOL_DIR 
 graph pie,over(SOL_DIR) by(trans_cond) plabel(_all percent) plabel(1 percent)
+**Then visually analyse the pie charts and check whether there is any difference
 
+**Can the chi2 test be used someway??
+tab trans_cond ASSETS_DIR,chi2
+tab trans_cond SOL_DIR,chi2
+
+*** SECTION C ***
+
+** --- 1 ---
+** 0 = Increased O/S Debt
+** 1 = Unchanged O/S Debt
+** 2 = Decreased O/S Debt
+
+order XDB5, after(DB5)
+recode XDB5 (.=0)
+recode DB5 (.=0)
+generate DEBT_DIR = 0 if XDB5>DB5 
+replace DEBT_DIR = 1 if XDB5==DB5
+replace DEBT_DIR = 2 if XDB5<DB5 
+label define DEBT_DIR 0 "Increased O/S Debt" 1 "Unchanged O/S Debt" 2 "Decreased O/S Debt"
+label value DEBT_DIR DEBT_DIR
+order DEBT_DIR,after(XDB5)
+
+**DB1C=MONEY LENDER IHDS2 1=YES 0=NO
+order DB1C,after(DEBT_DIR)
+graph pie, over(DB1C) by(DEBT_DIR) plabel(_all percent) plabel(1 percent)
+**By this pie basic what we can see is that if the person has decreased O/S debt they they are more likely to be a money lender.
+
+***Composition of the people in different socio religious groups(P2P-Persistence) segregated in diff DEBT_DIR groups
+tab DEBT_DIR socrel if trans==2
+**poverty persistence
+graph pie if trans==2, over(socrel) by(DEBT_DIR)
+**poverty NP2P-transition
+graph pie if trans==3, over(socrel) by(DEBT_DIR)
+**poverty P2NP-transition
+graph pie if trans==1, over(socrel) by(DEBT_DIR)
+*I can't see any close correlation but need to do significance tests.
+
+** ---2---
