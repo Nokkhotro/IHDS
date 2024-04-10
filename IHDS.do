@@ -130,4 +130,10 @@ tab SOCREL SOL_DIR
 tab SOCREL ASSETS_DIR
 
 ** --- 3 ---
+**-- 3 --
+order trans_cond, before(XASSETS5)
+bysort trans_cond:tab ASSETS_DIR
+graph pie,over(ASSETS_DIR) by(trans_cond) plabel(_all percent) plabel(1 percent)
+bysort trans_cond:tab SOL_DIR 
+graph pie,over(SOL_DIR) by(trans_cond) plabel(_all percent) plabel(1 percent)
 
