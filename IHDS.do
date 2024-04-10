@@ -96,5 +96,38 @@ graph pie if trans==2, over(socrel) plabel(_all percent) plabel(1 percent)
 graph pie if trans==3, over(socrel) plabel(_all percent) plabel(1 percent)
 graph pie if trans==4 & RSTATEID != ., over(socrel) plabel(_all percent) plabel(1 percent)
 
+** --- Section B ---
 
+** --- 1 ---
+** Generate a `SOL_DIR` to represent direction of change of standard of living
+/* 0 = Negative
+ * 1 = Unchanged
+ * 2 = Positive
+ * . = . [Inconclusive] */
+
+// WARNING: "necessarily not poor," how to proceed?
+generate SOL_DIR = 0 if XASSETS5 > ASSETS5
+replace SOL_DIR = 1 if XASSETS5 == ASSETS5
+replace SOL_DIR = 2 if XASSETS5 < ASSETS5 & ASSETS != .
+order ASSETS5 SOL_DIR, after(XASSETS5)
+
+label variable SOL_DIR "Direction of Change of Standard of Living"
+label define SOL_DIR 0 "Negative" 1 "Unchanged" 2 "Positive"
+label value SOL_DIR SOL_DIR
+
+** Similarly, generate an `ASSETS_DIR` to represent the change in asset holdings
+generate ASSETS_DIR = 0 if XASSETS2005 > ASSETS2005
+replace ASSETS_DIR = 1 if XASSETS2005 == ASSETS2005
+replace ASSETS_DIR = 2 if XASSETS2005 < ASSETS2005 & ASSETS != .
+order ASSETS2005 ASSETS_DIR, after(XASSETS2005)
+
+label variable ASSETS_DIR "Direction of Change in Asset Holdings"
+label define ASSETS_DIR 0 "Negative" 1 "Unchanged" 2 "Positive"
+label value ASSETS_DIR ASSETS_DIR
+
+** --- 2 ---
+tab SOCREL SOL_DIR 
+tab SOCREL ASSETS_DIR
+
+** --- 3 ---
 
