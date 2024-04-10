@@ -30,7 +30,7 @@ label variable socrel "Socio-Religious Identity"
 
 ** ---SECTION A---
 ****1****
-tab socrel if RSTATEID != .
+tab socrel
 graph bar (count), over(socrel)
 
 
